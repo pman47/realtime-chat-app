@@ -40,7 +40,6 @@ const Layout = async ({ children }: LayoutProps) => {
       `user:${session.user.id}:incoming_friend_requests`
     )) as User[]
   ).length;
-  console.log("unseenRequestCount", unseenRequestCount);
 
   return (
     <div className="w-full flex h-screen">
