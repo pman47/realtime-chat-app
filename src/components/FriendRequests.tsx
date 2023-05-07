@@ -16,7 +16,7 @@ const FriendRequests: FC<FriendRequestsProps> = ({
   sessionId,
 }) => {
   const router = useRouter();
-  const [friendRequest, setFriendRequest] = useState<IncomingFriendRequest[]>(
+  const [friendRequests, setFriendRequests] = useState<IncomingFriendRequest[]>(
     incomingFriendRequest
   );
 
@@ -25,8 +25,14 @@ const FriendRequests: FC<FriendRequestsProps> = ({
       toPusherKey(`user:${sessionId}:incoming_friend_requests`)
     );
 
-    const friendRequestHandler = () => {
-      console.log("New Friend Requests");
+    const friendRequestHandler = ({
+      senderId,
+      senderEmail,
+    }: IncomingFriendRequest) => {
+      console.log(senderId);
+      console.log(senderEmail);
+      console.log(friendRequests);
+      setFriendRequests((prev) => [...prev, { senderId, senderEmail }]);
     };
 
     pusherClient.bind("incoming_friend_requests", friendRequestHandler);
@@ -42,7 +48,7 @@ const FriendRequests: FC<FriendRequestsProps> = ({
     await axios.post("/api/friends/accept", {
       id: senderId,
     });
-    setFriendRequest((prev) =>
+    setFriendRequests((prev) =>
       prev.filter((request) => request.senderId !== senderId)
     );
     router.refresh();
@@ -52,7 +58,7 @@ const FriendRequests: FC<FriendRequestsProps> = ({
     await axios.post("/api/friends/deny", {
       id: senderId,
     });
-    setFriendRequest((prev) =>
+    setFriendRequests((prev) =>
       prev.filter((request) => request.senderId !== senderId)
     );
     router.refresh();
@@ -60,10 +66,10 @@ const FriendRequests: FC<FriendRequestsProps> = ({
 
   return (
     <>
-      {incomingFriendRequest.length === 0 ? (
+      {friendRequests.length === 0 ? (
         <p className="text-sm text-zinc-500">Nothing to show here...</p>
       ) : (
-        friendRequest.map((request) => (
+        friendRequests.map((request) => (
           <div className="flex gap-4 items-center" key={request.senderId}>
             <UserPlus className="text-black" />
             <p className="font-medium text-lg">{request.senderEmail}</p>
